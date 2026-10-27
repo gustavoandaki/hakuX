@@ -76,6 +76,13 @@ enum {
      * presents with nothing to wait for (vk/swapchain.c). On for every
      * driver but Turnip, whose present hands the compositor a fence. */
     HLE_QUIRK_PRESENT_CPU_WAIT = 1u << 11,
+    /* A uniform buffer indexed per vertex (the vertex programs' c[A0 + n],
+     * skinning's bone matrices) reads wrong values (Samsung's Xclipse): the
+     * constants (set 1, VshConst / FfConst) are a read-only storage buffer
+     * instead, same std140 layout and dynamic offsets (vk/draw.c,
+     * shader/ff.h g_hle_const_ssbo). Read when the back end starts: it
+     * changes the shaders. */
+    HLE_QUIRK_CONST_SSBO = 1u << 12,
 };
 
 /* Samsung's Xclipse GPUs (AMD RDNA in Exynos SoCs): their PCI vendor ID, and

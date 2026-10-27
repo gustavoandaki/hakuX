@@ -673,13 +673,16 @@ int hle_draw_init(void)
             return -1;
         }
     }
-    /* set 1: vertex-program constants, a dynamic window on the arena */
-    VkDescriptorSetLayoutBinding cb = { 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1,
-                                        VK_SHADER_STAGE_VERTEX_BIT, NULL };
+    /* set 1: vertex-program constants, a dynamic window on the arena; a
+     * storage buffer where a uniform one indexed by A0 reads wrong values */
+    g_hle_const_ssbo = hle_quirk(HLE_QUIRK_CONST_SSBO);    /* before any shader is made */
+    const VkDescriptorType ctype = g_hle_const_ssbo ? VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC
+                                                    : VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+    VkDescriptorSetLayoutBinding cb = { 0, ctype, 1, VK_SHADER_STAGE_VERTEX_BIT, NULL };
     VkDescriptorSetLayoutCreateInfo cci = {
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
         .bindingCount = 1, .pBindings = &cb };
-    VkDescriptorPoolSize cps = { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 2 };
+    VkDescriptorPoolSize cps = { ctype, 2 };
     VkDescriptorPoolCreateInfo cpi = {
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO, .maxSets = 2,
         .poolSizeCount = 1, .pPoolSizes = &cps };
@@ -701,7 +704,7 @@ int hle_draw_init(void)
         cw[i] = (VkWriteDescriptorSet){
             .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET, .dstSet = i ? g_dr.fset : g_dr.cset,
             .dstBinding = 0, .descriptorCount = 1,
-            .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, .pBufferInfo = &cbi[i] };
+            .descriptorType = ctype, .pBufferInfo = &cbi[i] };
     }
     T.vkUpdateDescriptorSets(g_hvk.dev, 2, cw, 0, NULL);
     /* HLE_PUSH_GLSL's std430 offsets */
