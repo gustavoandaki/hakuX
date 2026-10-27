@@ -83,6 +83,13 @@ enum {
      * shader/ff.h g_hle_const_ssbo). Read when the back end starts: it
      * changes the shaders. */
     HLE_QUIRK_CONST_SSBO = 1u << 12,
+    /* Programs' S32K attributes are fetched as integers (R16..._SINT) and
+     * converted in the shader; with this quirk as SSCALED floats, the same
+     * values (Xclipse, whose missing R16G16B16_SINT fell back to the
+     * four-component form, w read from the next 2 bytes). Where a driver
+     * lacks an n-component SINT format but has the SSCALED one, that is used
+     * regardless (vk/draw.c vat_format). Read when the back end starts. */
+    HLE_QUIRK_S32K_SCALED = 1u << 13,
 };
 
 /* Samsung's Xclipse GPUs (AMD RDNA in Exynos SoCs): their PCI vendor ID, and

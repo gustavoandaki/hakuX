@@ -196,6 +196,7 @@ static struct {
     struct { uint64_t hash; uint32_t nslots; uint32_t *tok; } prog[HLE_MAX_PROGS];
     uint32_t nprog;
     int8_t vfmt[256];                   /* vertex-buffer support: 0 unknown, 1 yes, -1 no */
+    bool s32k_scaled;                   /* HLE_QUIRK_S32K_SCALED (vat_format) */
     uint64_t draws, pipe_fail, compiles, prog_draws, layout_skips;
     uint64_t verts;                     /* vertices (indices) drawn */
     uint64_t idx_same, idx_contig;      /* indexed merge potential (hle_draw_ff_diag) */
@@ -715,6 +716,7 @@ int hle_draw_init(void)
     HLE_BUILD_BUG_ON(sizeof(HleFfPush) != HLE_PUSH_BYTES);
     g_hle_push_ssbo = !g_hvk.caps.push;     /* before any shader is made */
     g_hle_glsl_zw = hle_quirk(HLE_QUIRK_Z_EQ_W);
+    g_dr.s32k_scaled = hle_quirk(HLE_QUIRK_S32K_SCALED);
     g_hle_glsl_zclamp = !g_hvk.caps.depth_clamp;
     g_hle_glsl_fixed = !g_hvk.caps.bindless;
     if (g_hle_push_ssbo && !push_ring_init()) {
@@ -2497,8 +2499,21 @@ static VkFormat vat_format(uint8_t fmt, bool prog, unsigned *kind)
         return vfmt(k_s1[n - 1], k_s1[3]);
     case HLE_VAT_S32K:
         if (prog) {
+            /* SSCALED: the same values as floats (the program's vec4(v_in)),
+             * where the quirk asks or the n-component integer format is
+             * missing (Xclipse: no R16G16B16_SINT; its four-component form
+             * reads the next 2 bytes into w: MK Shaolin Monks' scenery as
+             * stretched polygons) */
+            VkFormat f = g_dr.s32k_scaled ? VK_FORMAT_UNDEFINED
+                                          : vfmt(k_si[n - 1], VK_FORMAT_UNDEFINED);
+            if (f == VK_FORMAT_UNDEFINED) {
+                VkFormat s = vfmt(k_ss[n - 1], VK_FORMAT_UNDEFINED);
+                if (s != VK_FORMAT_UNDEFINED) {
+                    return s;
+                }
+            }
             *kind = 1;
-            return vfmt(k_si[n - 1], k_si[3]);
+            return f != VK_FORMAT_UNDEFINED ? f : vfmt(k_si[n - 1], k_si[3]);
         }
         return vfmt(k_ss[n - 1], k_ss[3]);
     case HLE_VAT_CMP:                   /* 16-bit halves: often only 2-byte aligned */

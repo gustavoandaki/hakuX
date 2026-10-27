@@ -116,6 +116,10 @@ static const HleQuirk k_quirks[] = {
      * was right; the same block as a storage buffer drew them right
      * (2026-10-27). */
     { HLE_QUIRK_CONST_SSBO, "const_ssbo", samsung },
+    /* Xclipse 940, SPAL 25.3.3: MK Shaolin Monks' scenery (SHORT3 positions
+     * in vertex programs) as stretched polygons; fetched as R16G16B16_SSCALED
+     * it drew right (2026-10-27). */
+    { HLE_QUIRK_S32K_SCALED, "s32k_scaled", samsung },
 };
 
 static uint32_t g_defaults;
