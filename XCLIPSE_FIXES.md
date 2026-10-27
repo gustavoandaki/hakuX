@@ -38,6 +38,12 @@ device; everything below says how far each part was tested.
   default (same effect as `debug.hakux.caps=-vids,-eds1,-eds2`), with a log
   line. Other drivers are unchanged.
 
+| Before | After |
+|---|---|
+| ![MK Armageddon before: fighters as huge spiky triangles](xclipse/img/armageddon_before.jpg) | ![MK Armageddon after: Liu Kang vs Fujin drawn right](xclipse/img/armageddon_after.jpg) |
+
+*MK Armageddon on the Xclipse 940, 60 fps. Before: official hakuX 1.2.0. After: the Xclipse test build.*
+
 ### 2. Skinned characters as flat planes (Mortal Kombat: Shaolin Monks)
 
 * **Symptom:** with fix 1 alone, Armageddon was right but Shaolin Monks'
@@ -81,6 +87,12 @@ device; everything below says how far each part was tested.
     every program S32K attribute as SSCALED, which is what the tested patch
     did.
 
+| Before | After |
+|---|---|
+| ![MK Shaolin Monks before: scenery as stretched polygons](xclipse/img/shaolin_before.jpg) | ![MK Shaolin Monks after: dungeon scene drawn right](xclipse/img/shaolin_after.jpg) |
+
+*MK Shaolin Monks on the Xclipse 940, 60 fps. Before: a test build with fixes 1 and 2 only (fighters already right, scenery stretched). After: 1.2.0-xclipse-V13 (all three fixes).*
+
 Builds were cumulative on the device: fix 1 fixed Armageddon; fix 1 + 2
 fixed Shaolin Monks' fighters; fix 1 + 2 + 3 (test build
 `1.2.0-xclipse-V13`) fixed both games completely, at 60 fps.
@@ -114,6 +126,7 @@ fixed Shaolin Monks' fighters; fix 1 + 2 + 3 (test build
 
 * Commits 1–3: the source fixes (`hw/xbox/hle/vk/vkdev.c`, `vk/quirks.[ch]`,
   `vk/draw.c`, `shader/ff.h`, `shader/ff_gen.c`, `shader/vsh.c`).
+* `xclipse/img/`: before/after screenshots from the device.
 * `xclipse/`: how the tested APK was made: exact byte patches
   (`patch_libhakuxcore.py`), the smali diff (`smali_V13.diff`) and a
   script that rebuilds the APK from the official one (`rebuild_apk.py`).
