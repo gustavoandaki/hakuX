@@ -78,6 +78,11 @@ enum {
     HLE_QUIRK_PRESENT_CPU_WAIT = 1u << 11,
 };
 
+/* Samsung's Xclipse GPUs (AMD RDNA in Exynos SoCs): their PCI vendor ID, and
+ * VK_DRIVER_ID_SAMSUNG_PROPRIETARY (21) by number, for headers older than it */
+#define HLE_VENDOR_SAMSUNG    0x144Du
+#define HLE_DRIVER_ID_SAMSUNG 21u
+
 extern uint32_t g_hle_quirks;
 
 static inline bool hle_quirk(uint32_t q)
